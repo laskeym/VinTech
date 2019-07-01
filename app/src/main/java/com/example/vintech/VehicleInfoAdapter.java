@@ -1,6 +1,5 @@
 package com.example.vintech;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,9 +30,7 @@ public class VehicleInfoAdapter extends RecyclerView.Adapter<VehicleInfoAdapter.
     }
 
     public VehicleInfoAdapter(ArrayList<VehicleInfoItem> vInfoList) {
-        Log.d(TAG, "VehicleInfoAdapter: " + vInfoList);
         vehicleInfoList = vInfoList;
-        Log.d(TAG, "VehicleInfoAdapter: " + vehicleInfoList);
     }
 
     @NonNull

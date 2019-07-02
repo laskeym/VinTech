@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import jxl.Workbook;
-import jxl.demo.Write;
 import jxl.write.Label;
 import jxl.write.WritableCellFormat;
 import jxl.write.WritableFont;
@@ -23,9 +22,9 @@ public class SaveWorkbook {
     private WritableSheet workSheet;
 
 
-    public SaveWorkbook(Context c, String fileName) {
+    public SaveWorkbook(Context c, File file) {
         context = c;
-        fileLocation = new File(c.getFilesDir(), fileName);
+        fileLocation = file;
     }
 
     public void saveWorkbook(ArrayList<VehicleInfo> vehicleInfoList) {
@@ -107,6 +106,8 @@ public class SaveWorkbook {
 
                 label = new Label(4, i+1, vehicleInfo.getBodyClass());
                 workSheet.addCell(label);
+
+                i++;
             } catch (WriteException e) {
                 e.printStackTrace();
             }

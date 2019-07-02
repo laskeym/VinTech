@@ -15,11 +15,13 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import java.io.File;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 public class ListActivity extends AppCompatActivity {
     private static final String TAG = "LIST ACTIVITY";
+
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
@@ -36,8 +38,12 @@ public class ListActivity extends AppCompatActivity {
     private ArrayList<VehicleInfo> vehicleInfoList; // Retrieve from SharedPrefs
     private ArrayList<VehicleInfoItem> vehicleInfoItemList; //  RecyclerView list
 
-    // JExcel
+    // JExcel / Java Mail
+    private Context context;
+
+    private File fileLocation;
     private SaveWorkbook saveWorkbook;
+    private SendEmail email;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +56,10 @@ public class ListActivity extends AppCompatActivity {
         initRecyclerView();
         initFabMenu();
 
-        saveWorkbook = new SaveWorkbook(getApplicationContext(), "vehicleInfo.xls");
+        context = ListActivity.this;
+        fileLocation = new File(context.getFilesDir(), "VinTechVehicleReport.xls");
+        saveWorkbook = new SaveWorkbook(context, fileLocation);
+        email = new SendEmail(ListActivity.this, fileLocation);
     }
 
     private void loadVehicleInfoList() {
@@ -150,6 +159,7 @@ public class ListActivity extends AppCompatActivity {
                         case R.id.sendEmailBtn:
                             Log.i(TAG, "onClick: sendEmailBtn");
                             saveWorkbook.saveWorkbook(vehicleInfoList);
+                            email.sendEmail();
                             break;
                         case R.id.clearAllBtn:
                             Log.i(TAG, "onClick: clearAllBtn");

@@ -4,6 +4,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -14,20 +15,6 @@ import java.util.ArrayList;
 public class VehicleInfoAdapter extends RecyclerView.Adapter<VehicleInfoAdapter.VehicleInfoViewHolder> {
     private static final String TAG = "VehicleAdapter";
     private ArrayList<VehicleInfoItem> vehicleInfoList;
-
-    public static class VehicleInfoViewHolder extends RecyclerView.ViewHolder {
-        public ImageView vehicleImageView;
-        public TextView vehicleDescView;
-        public TextView vehicleVINView;
-
-        public VehicleInfoViewHolder(@NonNull View itemView) {
-            super(itemView);
-
-            vehicleImageView = itemView.findViewById(R.id.vehicleImage);
-            vehicleDescView = itemView.findViewById(R.id.vehicleDescription);
-            vehicleVINView = itemView.findViewById(R.id.vehicleVIN);
-        }
-    }
 
     public VehicleInfoAdapter(ArrayList<VehicleInfoItem> vInfoList) {
         vehicleInfoList = vInfoList;
@@ -54,5 +41,31 @@ public class VehicleInfoAdapter extends RecyclerView.Adapter<VehicleInfoAdapter.
     @Override
     public int getItemCount() {
         return vehicleInfoList.size();
+    }
+
+    public void removeItem(int position) {
+        vehicleInfoList.remove(position);
+        notifyItemRemoved(position);
+    }
+
+    public void restoreItem(VehicleInfoItem item, int position) {
+        vehicleInfoList.add(position, item);
+        notifyItemInserted(position);
+    }
+
+    public static class VehicleInfoViewHolder extends RecyclerView.ViewHolder {
+        public RelativeLayout viewForeground;
+        public ImageView vehicleImageView;
+        public TextView vehicleDescView;
+        public TextView vehicleVINView;
+
+        public VehicleInfoViewHolder(@NonNull View itemView) {
+            super(itemView);
+
+            viewForeground = itemView.findViewById(R.id.viewForeground);
+            vehicleImageView = itemView.findViewById(R.id.vehicleImage);
+            vehicleDescView = itemView.findViewById(R.id.vehicleDescription);
+            vehicleVINView = itemView.findViewById(R.id.vehicleVIN);
+        }
     }
 }

@@ -1,17 +1,23 @@
 package com.example.vintech;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.OvershootInterpolator;
+import android.widget.RelativeLayout;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -19,8 +25,10 @@ import java.io.File;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 
-public class ListActivity extends AppCompatActivity {
+public class ListActivity extends AppCompatActivity implements RecyclerItemTouchHelperListener {
     private static final String TAG = "LIST ACTIVITY";
+
+    private RelativeLayout rootLayout;
 
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
@@ -50,16 +58,45 @@ public class ListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
 
+        rootLayout = findViewById(R.id.rootLayout);
         loadVehicleInfoList();
         convertVehicleArrayList();
 
         initRecyclerView();
+
+        ItemTouchHelper.SimpleCallback itemTouchHelperCallback =
+                new RecyclerItemTouchHelper(0, ItemTouchHelper.LEFT, this);
+        new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(mRecyclerView);
+
         initFabMenu();
 
         context = ListActivity.this;
         fileLocation = new File(context.getFilesDir(), "VinTechVehicleReport.xls");
         saveWorkbook = new SaveWorkbook(context, fileLocation);
         email = new SendEmail(ListActivity.this, fileLocation);
+    }
+
+    @Override
+    public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction, int position) {
+        if(viewHolder instanceof VehicleInfoAdapter.VehicleInfoViewHolder) {
+            String vin = vehicleInfoItemList.get(viewHolder.getAdapterPosition()).getVehicleVIN();
+
+            final VehicleInfoItem deleteItem = vehicleInfoItemList.get(viewHolder.getAdapterPosition());
+            final int deleteIndex = viewHolder.getAdapterPosition();
+
+            ((VehicleInfoAdapter) mAdapter).removeItem(deleteIndex);
+
+            Snackbar snackbar = Snackbar.make(rootLayout, "Vehicle removed from list!", Snackbar.LENGTH_INDEFINITE);
+            snackbar.setAction("UNDO", new View.OnClickListener() {
+
+                @Override
+                public void onClick(View view) {
+                    ((VehicleInfoAdapter) mAdapter).restoreItem(deleteItem, deleteIndex);
+                }
+            });
+            snackbar.setActionTextColor(Color.YELLOW);
+            snackbar.show();
+        }
     }
 
     private void loadVehicleInfoList() {
@@ -86,6 +123,17 @@ public class ListActivity extends AppCompatActivity {
         }
     }
 
+    private void initRecyclerView() {
+        mRecyclerView = findViewById(R.id.recyclerView);
+        mLayoutManager = new LinearLayoutManager(this);
+        mAdapter = new VehicleInfoAdapter(vehicleInfoItemList);
+
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        mRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
+        mRecyclerView.setAdapter(mAdapter);
+    }
+
     private void initFabMenu() {
         listMenuBtn = findViewById(R.id.listMenuBtn);
         addVINBtn = findViewById(R.id.addVINBtn);
@@ -106,15 +154,6 @@ public class ListActivity extends AppCompatActivity {
         addVINBtn.setOnClickListener(fabMenuClick);
         sendEmailBtn.setOnClickListener(fabMenuClick);
         clearAllBtn.setOnClickListener(fabMenuClick);
-    }
-
-    private void initRecyclerView() {
-        mRecyclerView = findViewById(R.id.recyclerView);
-        mLayoutManager = new LinearLayoutManager(this);
-        mAdapter = new VehicleInfoAdapter(vehicleInfoItemList);
-
-        mRecyclerView.setLayoutManager(mLayoutManager);
-        mRecyclerView.setAdapter(mAdapter);
     }
 
     private void openMenu() {
@@ -167,5 +206,4 @@ public class ListActivity extends AppCompatActivity {
                     }
                 }
             };
-
 }

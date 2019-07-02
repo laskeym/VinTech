@@ -34,7 +34,6 @@ public class SaveWorkbook {
 
         try {
             workbook.write();
-            Toast.makeText(context, "Workbook saved at: " + fileLocation, Toast.LENGTH_SHORT).show();
         } catch (IOException e) {
             e.printStackTrace();
         } finally {

@@ -18,11 +18,8 @@ public class VinValidator {
     private HashMap<Character, Character> transliterationTable;
     private HashMap<Integer, Integer> weightedProductsFactorTable;
 
-    private ArrayList<VehicleInfo> vehicleInfoList;
-
     public VinValidator(Context ctx) {
         context = ctx;
-        loadVehicleInfoList();
     }
 
 
@@ -153,35 +150,10 @@ public class VinValidator {
         return false;
     }
 
-    private void loadVehicleInfoList() {
-        SharedPreferences prefs = context.getSharedPreferences("vehicleInfoList", Context.MODE_PRIVATE);
-        Gson gson = new Gson();
-        String json = prefs.getString("vehicleInfoList", null);
-        Type type = new TypeToken<ArrayList<VehicleInfo>>() {}.getType();
-
-        vehicleInfoList = gson.fromJson(json, type);
-        if(vehicleInfoList == null) {
-            vehicleInfoList = new ArrayList<>();
-        }
-    }
-
-    public boolean doesVINExist() {
-        for(VehicleInfo vehicleInfo: vehicleInfoList) {
-            if(vehicleInfo.getVin().equals(vinNumber)) {
-                return true;
-            }
+    public boolean doesVINExist(VehicleInfoList vehicleInfoList) {
+        if(vehicleInfoList.getVehicleInfo(vinNumber) != null) {
+            return true;
         }
         return false;
-    }
-
-    public void addVIN(VehicleInfo vehicleInfo) {
-        vehicleInfoList.add(0, vehicleInfo);
-
-        SharedPreferences pref = context.getSharedPreferences("vehicleInfoList", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = pref.edit();
-        Gson gson = new Gson();
-        String json = gson.toJson(vehicleInfoList);
-        editor.putString("vehicleInfoList", json);
-        editor.apply();
     }
 }

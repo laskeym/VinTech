@@ -42,8 +42,7 @@ public class ListActivity extends AppCompatActivity implements RecyclerItemTouch
 
     private OvershootInterpolator interpolator = new OvershootInterpolator();
 
-    // When deleting, delete from both arrays, then update SharedPrefs
-    private ArrayList<VehicleInfo> vehicleInfoList; // Retrieve from SharedPrefs
+    private VehicleInfoList vehicleInfoList;
     private ArrayList<VehicleInfoItem> vehicleInfoItemList; //  RecyclerView list
 
     // JExcel / Java Mail
@@ -58,8 +57,9 @@ public class ListActivity extends AppCompatActivity implements RecyclerItemTouch
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
 
+        context = ListActivity.this;
         rootLayout = findViewById(R.id.rootLayout);
-        loadVehicleInfoList();
+        vehicleInfoList = new VehicleInfoList(context);
         convertVehicleArrayList();
 
         initRecyclerView();
@@ -70,7 +70,6 @@ public class ListActivity extends AppCompatActivity implements RecyclerItemTouch
 
         initFabMenu();
 
-        context = ListActivity.this;
         fileLocation = new File(context.getFilesDir(), "VinTechVehicleReport.xls");
         saveWorkbook = new SaveWorkbook(context, fileLocation);
         email = new SendEmail(ListActivity.this, fileLocation);
@@ -82,9 +81,11 @@ public class ListActivity extends AppCompatActivity implements RecyclerItemTouch
             String vin = vehicleInfoItemList.get(viewHolder.getAdapterPosition()).getVehicleVIN();
 
             final VehicleInfoItem deleteItem = vehicleInfoItemList.get(viewHolder.getAdapterPosition());
+            final VehicleInfo deleteInfo = vehicleInfoList.getVehicleInfoList().get(viewHolder.getAdapterPosition());
             final int deleteIndex = viewHolder.getAdapterPosition();
 
             ((VehicleInfoAdapter) mAdapter).removeItem(deleteIndex);
+            vehicleInfoList.removeVehicleInfo(deleteIndex);
 
             Snackbar snackbar = Snackbar.make(rootLayout, "Vehicle removed from list!", Snackbar.LENGTH_INDEFINITE);
             snackbar.setAction("UNDO", new View.OnClickListener() {
@@ -92,6 +93,7 @@ public class ListActivity extends AppCompatActivity implements RecyclerItemTouch
                 @Override
                 public void onClick(View view) {
                     ((VehicleInfoAdapter) mAdapter).restoreItem(deleteItem, deleteIndex);
+                    vehicleInfoList.restoreVehicleInfo(deleteInfo, deleteIndex);
                 }
             });
             snackbar.setActionTextColor(Color.YELLOW);
@@ -99,21 +101,9 @@ public class ListActivity extends AppCompatActivity implements RecyclerItemTouch
         }
     }
 
-    private void loadVehicleInfoList() {
-        SharedPreferences prefs = getApplicationContext().getSharedPreferences("vehicleInfoList", Context.MODE_PRIVATE);
-        Gson gson = new Gson();
-        String json = prefs.getString("vehicleInfoList", null);
-        Type type = new TypeToken<ArrayList<VehicleInfo>>() {}.getType();
-
-        vehicleInfoList = gson.fromJson(json, type);
-        if(vehicleInfoList == null) {
-            vehicleInfoList = new ArrayList<>();
-        }
-    }
-
     private void convertVehicleArrayList() {
         vehicleInfoItemList = new ArrayList<>();
-        for(VehicleInfo vehicleInfo: vehicleInfoList) {
+        for(VehicleInfo vehicleInfo: vehicleInfoList.getVehicleInfoList()) {
             vehicleInfoItemList.add(vehicleInfoItemList.size(),
                     new VehicleInfoItem(
                             R.drawable.ic_directions_car_black_24dp,
@@ -197,7 +187,7 @@ public class ListActivity extends AppCompatActivity implements RecyclerItemTouch
                             break;
                         case R.id.sendEmailBtn:
                             Log.i(TAG, "onClick: sendEmailBtn");
-                            saveWorkbook.saveWorkbook(vehicleInfoList);
+                            saveWorkbook.saveWorkbook(vehicleInfoList.getVehicleInfoList());
                             email.sendEmail();
                             break;
                         case R.id.clearAllBtn:

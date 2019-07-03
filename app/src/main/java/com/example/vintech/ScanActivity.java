@@ -33,6 +33,7 @@ public class ScanActivity extends AppCompatActivity implements GetVehicleInfoLis
     private BarcodeDetector detector;
     private CameraSource cameraSource;
 
+    private VehicleInfoList vehicleInfoList;
     private VinValidator vinValidator;
 
     @Override
@@ -44,6 +45,7 @@ public class ScanActivity extends AppCompatActivity implements GetVehicleInfoLis
         svBarcode = findViewById(R.id.sv_barcode);
         tvBarcode = findViewById(R.id.tv_barcode);
 
+        vehicleInfoList = new VehicleInfoList(context);
         vinValidator = new VinValidator(context);
 
         initBarcodeScanner();
@@ -51,7 +53,7 @@ public class ScanActivity extends AppCompatActivity implements GetVehicleInfoLis
 
     @Override
     public void onEventCompleted(VehicleInfo vehicleInfo) {
-        vinValidator.addVIN(vehicleInfo);
+        vehicleInfoList.addVehicleInfo(vehicleInfo);
         tvBarcode.setText("VIN added!");
     }
 
@@ -86,7 +88,7 @@ public class ScanActivity extends AppCompatActivity implements GetVehicleInfoLis
                 final String vin = barcodes.valueAt(0).displayValue;
 
                 if(vinValidator.validateVIN(vin)) {
-                    if(vinValidator.doesVINExist()) {
+                    if(vinValidator.doesVINExist(vehicleInfoList)) {
                         tvBarcode.setText("VIN already has been scanned!");
                     } else {
                         tvBarcode.setText("Grabbing vehicle information...");

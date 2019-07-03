@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -28,6 +29,9 @@ import java.util.ArrayList;
 public class ListActivity extends AppCompatActivity implements RecyclerItemTouchHelperListener {
     private static final String TAG = "LIST ACTIVITY";
 
+    public static ListActivity fa;
+    private Context context;
+
     private RelativeLayout rootLayout;
 
     private RecyclerView mRecyclerView;
@@ -46,8 +50,6 @@ public class ListActivity extends AppCompatActivity implements RecyclerItemTouch
     private ArrayList<VehicleInfoItem> vehicleInfoItemList; //  RecyclerView list
 
     // JExcel / Java Mail
-    private Context context;
-
     private File fileLocation;
     private SaveWorkbook saveWorkbook;
     private SendEmail email;
@@ -57,6 +59,7 @@ public class ListActivity extends AppCompatActivity implements RecyclerItemTouch
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
 
+        fa = this;
         context = ListActivity.this;
         rootLayout = findViewById(R.id.rootLayout);
         vehicleInfoList = new VehicleInfoList(context);
@@ -183,10 +186,10 @@ public class ListActivity extends AppCompatActivity implements RecyclerItemTouch
                             }
                             break;
                         case R.id.addVINBtn:
-                            Log.i(TAG, "onClick: addVINBtn");
+                            Intent intent = new Intent(context, AddVehicle.class);
+                            startActivity(intent);
                             break;
                         case R.id.sendEmailBtn:
-                            Log.i(TAG, "onClick: sendEmailBtn");
                             saveWorkbook.saveWorkbook(vehicleInfoList.getVehicleInfoList());
                             email.sendEmail();
                             break;

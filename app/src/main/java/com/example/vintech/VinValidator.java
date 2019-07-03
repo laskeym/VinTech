@@ -1,17 +1,9 @@
 package com.example.vintech;
 
 import android.content.Context;
-import android.content.SharedPreferences;
-
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
-import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 public class VinValidator {
-    private static final String TAG = "VinValidator";
     private Context context;
 
     private String vinNumber;
@@ -57,7 +49,7 @@ public class VinValidator {
         if (vin.length() == 18) {
             vin = vin.substring(1, vin.length());
         }
-        return vin;
+        return vin.toUpperCase();
     }
 
     private String vinTransliteration() {

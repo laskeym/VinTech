@@ -85,7 +85,7 @@ public class ScanActivity extends AppCompatActivity implements GetVehicleInfoLis
             final SparseArray<Barcode> barcodes = detections.getDetectedItems();
 
             if(barcodes != null && barcodes.size() > 0) {
-                final String vin = barcodes.valueAt(0).displayValue;
+                final String vin = barcodes.valueAt(0).displayValue.toUpperCase();
 
                 if(vinValidator.validateVIN(vin)) {
                     if(vinValidator.doesVINExist(vehicleInfoList)) {
@@ -137,7 +137,7 @@ public class ScanActivity extends AppCompatActivity implements GetVehicleInfoLis
         return callback;
     }
 
-    public void getVehicleInfo(String vin) {
+    private void getVehicleInfo(String vin) {
         new GetVehicleInfoTask(vin, this).execute();
     }
 

@@ -17,9 +17,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".AddVehicle"></activity>
+        <activity android:name=".AddVehicle" />
         <activity android:name=".ListActivity" />
-        <activity android:name=".ScanActivity" />
+        <activity
+            android:name=".ScanActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".MainActivity"
             android:screenOrientation="portrait">

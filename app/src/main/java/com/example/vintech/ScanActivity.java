@@ -92,7 +92,7 @@ public class ScanActivity extends AppCompatActivity implements GetVehicleInfoLis
                         tvBarcode.setText("VIN already has been scanned!");
                     } else {
                         tvBarcode.setText("Grabbing vehicle information...");
-                        getVehicleInfo(vin);
+                        getVehicleInfo(vinValidator.getVinNumber());
                     }
                 } else {
                     tvBarcode.setText("Invalid VIN!");

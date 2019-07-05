@@ -1,9 +1,11 @@
 package com.example.vintech;
 
 import android.content.Context;
+
 import java.util.HashMap;
 
 public class VinValidator {
+    private static final String TAG = "VinValidator";
     private Context context;
 
     private String vinNumber;
@@ -14,10 +16,13 @@ public class VinValidator {
         context = ctx;
     }
 
+    public String getVinNumber() {
+        return vinNumber;
+    }
 
     public boolean validateVIN(String vin) {
-        if (checkLength(vin) && !checkForIllegalCharacters(vin)) {
-            vinNumber = trimVIN(vin);
+        vinNumber = trimVIN(vin);
+        if (checkLength(vinNumber) && !checkForIllegalCharacters(vinNumber)) {
             String transliteratedVIN = vinTransliteration();
             int weightedSum = computeWeightedProductsSum(transliteratedVIN);
             int remainder = weightedSum % 11;

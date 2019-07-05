@@ -1,6 +1,7 @@
 package com.example.vintech;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -9,31 +10,29 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.animation.OvershootInterpolator;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
 import java.io.File;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 
-public class ListActivity extends AppCompatActivity implements RecyclerItemTouchHelperListener {
+public class ListActivity extends AppCompatActivity implements RecyclerItemTouchHelperListener, ClearListDialog.ClearListDialogListener {
     private static final String TAG = "LIST ACTIVITY";
 
     public static ListActivity fa;
     private Context context;
+    private Toolbar toolbar;
 
     private RelativeLayout rootLayout;
 
+    private TextView emptyList;
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
@@ -61,6 +60,8 @@ public class ListActivity extends AppCompatActivity implements RecyclerItemTouch
 
         fa = this;
         context = ListActivity.this;
+        toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
         rootLayout = findViewById(R.id.rootLayout);
         vehicleInfoList = new VehicleInfoList(context);
         convertVehicleArrayList();
@@ -117,9 +118,18 @@ public class ListActivity extends AppCompatActivity implements RecyclerItemTouch
     }
 
     private void initRecyclerView() {
+        emptyList = findViewById(R.id.emptyList);
+        emptyList.setVisibility(View.GONE);
+        emptyList.setText("Nothing to show...");
+
         mRecyclerView = findViewById(R.id.recyclerView);
         mLayoutManager = new LinearLayoutManager(this);
         mAdapter = new VehicleInfoAdapter(vehicleInfoItemList);
+
+        if(mAdapter.getItemCount() == 0) {
+            emptyList.setVisibility(View.VISIBLE);
+            mRecyclerView.setVisibility(View.GONE);
+        }
 
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -194,9 +204,21 @@ public class ListActivity extends AppCompatActivity implements RecyclerItemTouch
                             email.sendEmail();
                             break;
                         case R.id.clearAllBtn:
-                            Log.i(TAG, "onClick: clearAllBtn");
+                            openClearListDialog();
                             break;
                     }
                 }
             };
+
+    public void openClearListDialog() {
+        ClearListDialog clearListDialog = new ClearListDialog();
+        clearListDialog.show(getSupportFragmentManager(), "Clear List Dialog");
+    }
+
+    @Override
+    public void clearVehicleList() {
+        vehicleInfoList.clearList();
+        vehicleInfoItemList.clear();
+        initRecyclerView();
+    }
 }

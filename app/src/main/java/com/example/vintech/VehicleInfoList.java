@@ -64,6 +64,11 @@ public class VehicleInfoList {
         saveVehicleInfoList();
     }
 
+    public void clearList() {
+        vehicleInfoList.clear();
+        saveVehicleInfoList();
+    }
+
     private void saveVehicleInfoList() {
         String json = gson.toJson(vehicleInfoList);
         editor.putString("vehicleInfoList", json);
